@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { CircularProgress } from 'material-ui/Progress'
 import { ResponsiveContainer, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, Area } from 'recharts'
 
@@ -6,24 +6,32 @@ import * as util from './util'
 
 import { connect } from 'react-redux'
 
-const filter = (population, from, to) => population.filter((v) => (v.time > util.dateRoundDown(from)) && (v.time < util.dateRoundUp(to)))
+class Display extends Component {
+	get population() {
+		return this.props.population.filter((v) => (v.time > util.dateRoundDown(this.props.dateFrom)) && (v.time < util.dateRoundUp(this.props.dateTo)))
+	}
 
-const Display = (props) => (
-		!props.population.length
-			? <CircularProgress />
-			: <ResponsiveContainer height={300}>
-					<AreaChart data={filter(props.population, props.dateFrom, props.dateTo)}>
-						<CartesianGrid />
-						<Tooltip />
-						<XAxis dataKey='time' />
-						<YAxis />
+	render() {
+		if (!this.props.population.length) {
+			return <CircularProgress />
+		}
 
-						<Area dataKey='days1' />
-						<Area dataKey='days10' />
-						<Area dataKey='days30' />
-					</AreaChart>
-				</ResponsiveContainer>
-)
+		return (
+			<ResponsiveContainer height={300}>
+				<AreaChart data={this.population}>
+					<CartesianGrid />
+					<Tooltip />
+					<XAxis dataKey='time' />
+					<YAxis />
+
+					<Area dataKey='days1' />
+					<Area dataKey='days10' />
+					<Area dataKey='days30' />
+				</AreaChart>
+			</ResponsiveContainer>
+		)
+	}
+}
 
 export default connect(
 	(state) => ({
