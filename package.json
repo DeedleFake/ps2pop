@@ -24,13 +24,14 @@
     "mat": "^0.1.29",
     "material-ui": "^1.0.0-beta.34",
     "material-ui-icons": "^1.0.0-beta.17",
+    "material-ui-pickers": "^1.0.0-beta.15.1",
+    "moment": "^2.11.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.7",
     "react-scripts": "^1.1.1",
     "recharts": "^1.0.0-beta.10",
-    "redux": "^3.7.2",
-    "moment": "^2.11.2"
+    "redux": "^3.7.2"
   },
   "proxy": "http://localhost:8080"
 }

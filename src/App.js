@@ -4,12 +4,14 @@ import AppBar from 'material-ui/AppBar'
 import Toolbar from 'material-ui/Toolbar'
 import Typography from 'material-ui/Typography'
 import Paper from 'material-ui/Paper'
-import TextField from 'material-ui/TextField'
 import { CircularProgress } from 'material-ui/Progress'
 import { withStyles } from 'material-ui/styles'
+import { DatePicker } from 'material-ui-pickers'
+
+import KeyboardArrowLeftIcon from 'material-ui-icons/KeyboardArrowLeft'
+import KeyboardArrowRightIcon from 'material-ui-icons/KeyboardArrowRight'
 
 import Display from './Display'
-import * as util from './util'
 
 import { connect } from 'react-redux'
 import {
@@ -35,20 +37,24 @@ class App extends Component {
 		this.props.loadPopulation()
 	}
 
-	get dateFrom() {
-		if (!this.props.dateFrom) {
-			return null
-		}
+	setVal = (k) => (ev) => {
+		this[k] = ev.target.value
+	}
 
-		return util.formatDate(this.props.dateFrom)
+	get dateFrom() {
+		return this.props.dateFrom
+	}
+
+	set dateFrom(val) {
+		this.props.setRange(val, this.props.dateTo)
 	}
 
 	get dateTo() {
-		if (!this.props.dateTo) {
-			return null
-		}
+		return this.props.dateTo
+	}
 
-		return util.formatDate(this.props.dateTo)
+	set dateTo(val) {
+		this.props.setRange(this.props.dateFrom, val)
 	}
 
 	render() {
@@ -71,15 +77,16 @@ class App extends Component {
 
 					<Grid item xs={3}>
 						<Paper className={this.props.classes.paper}>
-							{!this.props.dateFrom
+							{!this.props.dateFrom || !this.props.population.length
 								? <CircularProgress />
-								: <TextField
+								: <DatePicker
 										label='From'
-										type='date'
 										value={this.dateFrom}
-										InputLabelProps={{
-											shrink: true,
-										}}
+										onChange={(date) => this.dateFrom = date}
+										minDate={this.props.population[0].time}
+										maxDate={this.props.dateTo}
+										leftArrowIcon={<KeyboardArrowLeftIcon />}
+										rightArrowIcon={<KeyboardArrowRightIcon />}
 									/>
 							}
 						</Paper>
@@ -87,15 +94,16 @@ class App extends Component {
 
 					<Grid item xs={3}>
 						<Paper className={this.props.classes.paper}>
-							{!this.props.dateTo
+							{!this.props.dateTo || !this.props.population.length
 								? <CircularProgress />
-								: <TextField
+								: <DatePicker
 										label='To'
-										type='date'
 										value={this.dateTo}
-										InputLabelProps={{
-											shrink: true,
-										}}
+										onChange={(date) => this.dateTo = date}
+										minDate={this.props.dateFrom}
+										maxDate={this.props.population[this.props.population.length - 1].time}
+										leftArrowIcon={<KeyboardArrowLeftIcon />}
+										rightArrowIcon={<KeyboardArrowRightIcon />}
 									/>
 							}
 						</Paper>
