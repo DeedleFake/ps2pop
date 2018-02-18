@@ -99,6 +99,7 @@ func handleData(rw http.ResponseWriter, req *http.Request) {
 
 func main() {
 	root := flag.String("root", "pub", "Root of the web server.")
+	addr := flag.String("addr", ":8080", "Address to listen on.")
 	dbpath := flag.String("db", "ps2pop.db", "Path to database.")
 	flag.Parse()
 
@@ -111,7 +112,8 @@ func main() {
 	http.HandleFunc("/data", handleData)
 	http.Handle("/", http.FileServer(http.Dir(*root)))
 
-	err = http.ListenAndServe(":8080", nil)
+	log.Printf("Starting HTTP server on %q", *addr)
+	err = http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatalf("Failed to start web server: %v", err)
 	}
