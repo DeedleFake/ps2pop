@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"database/sql"
 	"encoding/json"
 	"flag"
@@ -14,53 +13,33 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const (
+	Table = "population"
+)
+
 var (
 	DB *sql.DB
 
-	tables = []string{
+	cols = []string{
 		"days1",
 		"days10",
 		"days30",
 	}
 )
 
-func getData(ctx context.Context, table string) (*sql.Rows, error) {
-	var found bool
-	for _, t := range tables {
-		if t == table {
-			found = true
-			break
-		}
-	}
-	if !found {
-		return nil, fmt.Errorf("Invalid table: %q", table)
-	}
-
-	return DB.QueryContext(ctx, fmt.Sprintf(`SELECT * FROM %v ORDER BY Date`, table))
-}
-
 func handleData(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	e := json.NewEncoder(rw)
 
-	wanted := req.FormValue("data")
-	if wanted == "" {
-		err := e.Encode(tables)
-		if err != nil {
-			log.Printf("Failed to encode table list: %v", err)
-		}
-		return
-	}
-
-	data, err := getData(req.Context(), wanted)
+	rows, err := DB.QueryContext(req.Context(), fmt.Sprintf(`SELECT * FROM %v ORDER BY Date`, Table))
 	if err != nil {
 		e.Encode(map[string]interface{}{
 			"error": err.Error(),
 		})
-		log.Printf("Failed to get data for %q: %v", wanted, err)
+		log.Printf("Failed to get data: %v", err)
 		return
 	}
-	defer data.Close()
+	defer rows.Close()
 
 	w := bufio.NewWriter(rw)
 	defer w.Flush()
@@ -70,20 +49,28 @@ func handleData(rw http.ResponseWriter, req *http.Request) {
 	defer w.WriteByte(']')
 
 	var comma bool
-	for data.Next() {
+	for rows.Next() {
 		if comma {
 			w.WriteByte(',')
 		}
 		comma = true
 
-		var row struct {
-			Time   time.Time `json:"time"`
-			Number int       `json:"number"`
+		data := []interface{}{new(time.Time)}
+		for range cols {
+			data = append(data, new(int))
 		}
-		err = data.Scan(&row.Time, &row.Number)
+
+		err = rows.Scan(data...)
 		if err != nil {
 			log.Printf("Failed to scan row: %v", err)
 			continue
+		}
+
+		row := map[string]interface{}{
+			"time": data[0],
+		}
+		for i, col := range cols {
+			row[col] = data[i+1]
 		}
 
 		err = e.Encode(row)
@@ -92,7 +79,7 @@ func handleData(rw http.ResponseWriter, req *http.Request) {
 			continue
 		}
 	}
-	if err := data.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		log.Printf("Failed to get rows: %v", err)
 	}
 }
