@@ -1,24 +1,30 @@
 import React from 'react'
 import { CircularProgress } from 'material-ui/Progress'
-import { AreaChart, CartesianGrid, XAxis, YAxis, Area } from 'recharts'
+import { ResponsiveContainer, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, Area } from 'recharts'
 
 import { connect } from 'react-redux'
 
 const Display = (props) => (
 		!props.population.length
 			? <CircularProgress />
-			: <AreaChart data={props.population}>
-					<CartesianGrid />
-					<XAxis dataKey='time' />
-					<YAxis dataKey='number' />
+			: <ResponsiveContainer height={300}>
+					<AreaChart data={props.population}>
+						<CartesianGrid />
+						<Tooltip />
+						<XAxis dataKey='time' />
+						<YAxis dataKey='number' />
 
-					<Area dataKey='number' />
-				</AreaChart>
+						<Area dataKey='number' />
+					</AreaChart>
+				</ResponsiveContainer>
 )
 
 export default connect(
 	(state) => ({
 		population: state.population,
+
+		dateFrom: state.range.from,
+		dateTo: state.range.to,
 	}),
 
 	{

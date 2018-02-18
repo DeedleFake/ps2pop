@@ -12,10 +12,13 @@ export const ajax = async (url) => {
 	})
 }
 
-export const parseJSON = (raw) => JSON.parse(raw, (val) => {
-	if (val.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]+Z/)) {
-		return new Date(val)
+export const parseJSON = (raw) => JSON.parse(raw, (k, v) => {
+	let date = Date.parse(v)
+	if (!isNaN(date)) {
+		return new Date(date)
 	}
 
-	return val
+	return v
 })
+
+export const formatDate = (t) => `${t.getFullYear().toString().padStart(4, '0')}-${(t.getMonth() + 1).toString().padStart(2, '0')}-${t.getDate().toString().padStart(2, '0')}`

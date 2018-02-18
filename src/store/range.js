@@ -20,6 +20,13 @@ export default (state = initial, action) => {
 				to: action.to,
 			}
 
+		case actions.LOAD_POPULATION:
+			return {
+				...state,
+				from: action.population[0].time,
+				to: action.population[action.population.length - 1].time,
+			}
+
 		default:
 			return state
 	}

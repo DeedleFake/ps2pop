@@ -9,6 +9,7 @@ import { CircularProgress } from 'material-ui/Progress'
 import { withStyles } from 'material-ui/styles'
 
 import Display from './Display'
+import * as util from './util'
 
 import { connect } from 'react-redux'
 import {
@@ -32,6 +33,22 @@ const styles = (theme) => ({
 class App extends Component {
 	componentDidMount() {
 		this.props.loadPopulation()
+	}
+
+	get dateFrom() {
+		if (!this.props.dateFrom) {
+			return null
+		}
+
+		return util.formatDate(this.props.dateFrom)
+	}
+
+	get dateTo() {
+		if (!this.props.dateTo) {
+			return null
+		}
+
+		return util.formatDate(this.props.dateTo)
 	}
 
 	render() {
@@ -59,7 +76,7 @@ class App extends Component {
 								: <TextField
 										label='From'
 										type='date'
-										value={this.props.dateFrom}
+										value={this.dateFrom}
 										InputLabelProps={{
 											shrink: true,
 										}}
@@ -75,7 +92,7 @@ class App extends Component {
 								: <TextField
 										label='To'
 										type='date'
-										value={this.props.dateFrom}
+										value={this.dateTo}
 										InputLabelProps={{
 											shrink: true,
 										}}
@@ -91,6 +108,8 @@ class App extends Component {
 
 export default connect(
 	(state) => ({
+		population: state.population,
+
 		dateFrom: state.range.from,
 		dateTo: state.range.to,
 	}),
