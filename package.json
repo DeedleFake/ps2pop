@@ -1,0 +1,35 @@
+{
+  "name": "ps2pop",
+  "version": "0.1.0",
+  "description": "A population tracker for PlanetSide 2.",
+  "scripts": {
+    "start": "BROWSER=none react-scripts start",
+    "build": "react-scripts build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeedleFake/ps2pop.git"
+  },
+  "keywords": [
+    "planetside 2",
+    "population"
+  ],
+  "author": "DeedleFake",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DeedleFake/ps2pop/issues"
+  },
+  "homepage": "https://github.com/DeedleFake/ps2pop#readme",
+  "devDependencies": {
+    "mat": "^0.1.29",
+    "material-ui": "^1.0.0-beta.34",
+    "material-ui-icons": "^1.0.0-beta.17",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-redux": "^5.0.7",
+    "react-scripts": "^1.1.1",
+    "recharts": "^1.0.0-beta.10",
+    "redux": "^3.7.2"
+  },
+  "proxy": "http://localhost:8080"
+}
