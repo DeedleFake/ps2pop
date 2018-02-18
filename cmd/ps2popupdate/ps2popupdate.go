@@ -8,10 +8,33 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/sync/errgroup"
+)
+
+const (
+	Table = "population"
+)
+
+type Key struct {
+	Name  string
+	Since time.Duration
+}
+
+type Update struct {
+	Name   string
+	Amount int
+}
+
+var (
+	keys = []Key{
+		{Name: "days1", Since: 24 * time.Hour},
+		{Name: "days10", Since: 10 * 24 * time.Hour},
+		{Name: "days30", Since: 30 * 24 * time.Hour},
+	}
 )
 
 func getCharacterCount(ctx context.Context, since time.Duration) (int, error) {
@@ -42,40 +65,53 @@ func getCharacterCount(ctx context.Context, since time.Duration) (int, error) {
 	return data.Count, err
 }
 
-type Table struct {
-	name  string
-	since time.Duration
-}
+func getUpdates(ctx context.Context, updates chan<- Update) error {
+	defer close(updates)
 
-func (t Table) Update(ctx context.Context, db *sql.DB) error {
-	_, err := db.ExecContext(ctx, fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %v (
-		Date DATETIME PRIMARY KEY DEFAULT CURRENT_TIMESTAMP,
-		Number INTEGER NOT NULL
-	);`, t.name))
-	if err != nil {
-		return fmt.Errorf("Error creating %q: %v", t.name, err)
+	eg, ctx := errgroup.WithContext(ctx)
+	for _, key := range keys {
+		key := key
+		eg.Go(func() error {
+			count, err := getCharacterCount(ctx, key.Since)
+			if err != nil {
+				return fmt.Errorf("Error getting update for %q: %v", key.Name, err)
+			}
+
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+
+			case updates <- Update{
+				Name:   key.Name,
+				Amount: count,
+			}:
+			}
+
+			return nil
+		})
 	}
-
-	count, err := getCharacterCount(ctx, t.since)
+	err := eg.Wait()
 	if err != nil {
-		return fmt.Errorf("Error getting character count for %q: %v", t.name, err)
+		return err
 	}
-
-	_, err = db.ExecContext(ctx, fmt.Sprintf(`INSERT INTO %v (Number) VALUES (?);`, t.name), count)
-	if err != nil {
-		return fmt.Errorf("Error updating %q: %v", t.name, err)
-	}
-
 	return nil
 }
 
-var (
-	tables = []Table{
-		{name: "days30", since: 30 * 24 * time.Hour},
-		{name: "days10", since: 10 * 24 * time.Hour},
-		{name: "days1", since: 24 * time.Hour},
+func initTable(ctx context.Context, db *sql.DB) error {
+	var cols []string
+	for _, key := range keys {
+		cols = append(cols, fmt.Sprintf("%v INTEGER NOT NULL", key.Name))
 	}
-)
+
+	_, err := db.ExecContext(ctx, fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %v (
+		date DATETIME PRIMARY KEY DEFAULT CURRENT_TIMESTAMP,
+		%v
+	);`, Table, strings.Join(cols, ", ")))
+	if err != nil {
+		return fmt.Errorf("Error creating table %q: %v", Table, err)
+	}
+	return nil
+}
 
 func main() {
 	dbpath := flag.String("db", "ps2pop.db", "Path to database.")
@@ -88,14 +124,35 @@ func main() {
 	defer db.Close()
 
 	eg, ctx := errgroup.WithContext(context.Background())
-	for _, table := range tables {
-		table := table
-		eg.Go(func() error {
-			return table.Update(ctx, db)
-		})
-	}
+
+	updates := make(chan Update, len(keys))
+	eg.Go(func() error {
+		return getUpdates(ctx, updates)
+	})
+
+	eg.Go(func() error {
+		return initTable(ctx, db)
+	})
+
 	err = eg.Wait()
 	if err != nil {
 		log.Fatalln(err)
+	}
+
+	var cols []string
+	var counts []interface{}
+	for update := range updates {
+		cols = append(cols, update.Name)
+		counts = append(counts, update.Amount)
+	}
+
+	_, err = db.Exec(fmt.Sprintf(
+		`INSERT INTO %v (%v) VALUES (%v);`,
+		Table,
+		strings.Join(cols, ", "),
+		strings.Join(strings.Split(strings.Repeat("?", len(cols)), ""), ", "),
+	), counts...)
+	if err != nil {
+		log.Fatalf("Failed to insert data: %v", err)
 	}
 }
