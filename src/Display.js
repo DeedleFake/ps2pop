@@ -24,9 +24,9 @@ class Display extends Component {
 					<XAxis dataKey='time' />
 					<YAxis />
 
-					<Area dataKey='days1' />
-					<Area dataKey='days10' />
-					<Area dataKey='days30' />
+					<Area dataKey='days1' stroke='navy' fill='blue' />
+					<Area dataKey='days10' stroke='purple' fill='fuchsia' />
+					<Area dataKey='days30' stroke='maroon' fill='red' />
 				</AreaChart>
 			</ResponsiveContainer>
 		)
