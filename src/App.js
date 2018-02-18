@@ -12,6 +12,7 @@ import KeyboardArrowLeftIcon from 'material-ui-icons/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from 'material-ui-icons/KeyboardArrowRight'
 
 import Display from './Display'
+import * as util from './util'
 
 import { connect } from 'react-redux'
 import {
@@ -35,10 +36,6 @@ const styles = (theme) => ({
 class App extends Component {
 	componentDidMount() {
 		this.props.loadPopulation()
-	}
-
-	setVal = (k) => (ev) => {
-		this[k] = ev.target.value
 	}
 
 	get dateFrom() {
@@ -83,8 +80,8 @@ class App extends Component {
 										label='From'
 										value={this.dateFrom}
 										onChange={(date) => this.dateFrom = date}
-										minDate={this.props.population[0].time}
-										maxDate={this.props.dateTo}
+										minDate={util.dateRoundDown(this.props.population[0].time)}
+										maxDate={util.dateRoundUp(this.props.dateTo)}
 										leftArrowIcon={<KeyboardArrowLeftIcon />}
 										rightArrowIcon={<KeyboardArrowRightIcon />}
 									/>
@@ -100,8 +97,8 @@ class App extends Component {
 										label='To'
 										value={this.dateTo}
 										onChange={(date) => this.dateTo = date}
-										minDate={this.props.dateFrom}
-										maxDate={this.props.population[this.props.population.length - 1].time}
+										minDate={util.dateRoundDown(this.props.dateFrom)}
+										maxDate={util.dateRoundUp(this.props.population[this.props.population.length - 1].time)}
 										leftArrowIcon={<KeyboardArrowLeftIcon />}
 										rightArrowIcon={<KeyboardArrowRightIcon />}
 									/>
