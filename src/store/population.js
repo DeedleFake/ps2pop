@@ -3,11 +3,7 @@ import * as actions from './actions'
 import * as util from '../util'
 
 export const loadPopulation = () => async ({getState, dispatch}) => {
-	let sets = util.parseJSON(await util.ajax('/data'))
-	let population = await Promise.all(sets.map(async (set) => util.parseJSON(await util.ajax(`/data?data=${set}`))))
-	population = sets.map((v, i) => [v, population[i]])
-	population = population.reduce((acc, cur) => Object.assign(acc, {[cur[0]]: cur[1]}), {})
-	console.log(population)
+	let population = util.parseJSON(await util.ajax('/data'))
 
 	return dispatch({
 		type: actions.LOAD_POPULATION,

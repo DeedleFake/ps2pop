@@ -12,9 +12,11 @@ const Display = (props) => (
 						<CartesianGrid />
 						<Tooltip />
 						<XAxis dataKey='time' />
-						<YAxis dataKey='number' />
+						<YAxis />
 
-						<Area dataKey='number' />
+						<Area dataKey='days1' />
+						<Area dataKey='days10' />
+						<Area dataKey='days30' />
 					</AreaChart>
 				</ResponsiveContainer>
 )
