@@ -8,7 +8,10 @@ import { connect } from 'react-redux'
 
 class Display extends Component {
 	get population() {
-		return this.props.population.filter((v) => (v.time > util.dateRoundDown(this.props.dateFrom)) && (v.time < util.dateRoundUp(this.props.dateTo)))
+		let from = util.dateRoundDown(this.props.dateFrom)
+		let to = util.dateRoundUp(this.props.dateTo)
+
+		return this.props.population.filter((v) => (v.time > from) && (v.time < to))
 	}
 
 	render() {
