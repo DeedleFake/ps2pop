@@ -6,6 +6,12 @@ import * as util from './util'
 
 import { connect } from 'react-redux'
 
+const sets = [
+	{num: 1, stroke: 'navy', fill: 'blue'},
+	{num: 10, stroke: 'purple', fill: 'fuchsia'},
+	{num: 30, stroke: 'maroon', fill: 'red'},
+]
+
 class Display extends Component {
 	get population() {
 		let from = util.dateRoundDown(this.props.dateFrom)
@@ -27,9 +33,15 @@ class Display extends Component {
 					<XAxis dataKey='time' />
 					<YAxis />
 
-					<Area dataKey='days1' stroke='navy' fill='blue' />
-					<Area dataKey='days10' stroke='purple' fill='fuchsia' />
-					<Area dataKey='days30' stroke='maroon' fill='red' />
+					{sets.map((set) => (
+						<Area
+							key={set.num}
+							dataKey={`days${set.num}`}
+							name={`Prev ${set.num} ${util.plural('day', set.num)}`}
+							stroke={set.stroke}
+							fill={set.fill}
+						/>
+					))}
 				</AreaChart>
 			</ResponsiveContainer>
 		)

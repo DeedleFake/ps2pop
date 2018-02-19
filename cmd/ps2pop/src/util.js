@@ -44,3 +44,5 @@ export const dateRoundUp = (date) => {
 
 	return date
 }
+
+export const plural = (str, num) => num === 1 ? str : `${str}s`
