@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -104,7 +104,7 @@ func initTable(ctx context.Context, db *sql.DB) error {
 	}
 
 	_, err := db.ExecContext(ctx, fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %v (
-		date DATETIME PRIMARY KEY DEFAULT CURRENT_TIMESTAMP,
+		date DATE PRIMARY KEY DEFAULT CURRENT_DATE,
 		%v
 	);`, Table, strings.Join(cols, ", ")))
 	if err != nil {
@@ -114,12 +114,21 @@ func initTable(ctx context.Context, db *sql.DB) error {
 }
 
 func main() {
-	dbpath := flag.String("db", "ps2pop.db", "Path to database.")
+	dbaddr := flag.String("dbaddr", "localhost", "Database address.")
+	dbuser := flag.String("dbuser", "postgres", "Database user.")
+	dbpass := flag.String("dbpass", "", "Database password.")
+	dbname := flag.String("dbname", "ps2pop", "Database name.")
 	flag.Parse()
 
-	db, err := sql.Open("sqlite3", *dbpath)
+	db, err := sql.Open("postgres", fmt.Sprintf(
+		"postgres://%v:%v@%v/%v?sslmode=disable",
+		*dbuser,
+		*dbpass,
+		*dbaddr,
+		*dbname,
+	))
 	if err != nil {
-		log.Fatalf("Failed to open database at %q: %v", *dbpath, err)
+		log.Fatalf("Failed to open database: %v", err)
 	}
 	defer db.Close()
 
@@ -140,9 +149,11 @@ func main() {
 	}
 
 	var cols []string
+	var params []string
 	var counts []interface{}
 	for update := range updates {
 		cols = append(cols, update.Name)
+		params = append(params, fmt.Sprintf("$%v", len(params)+1))
 		counts = append(counts, update.Amount)
 	}
 
@@ -150,7 +161,7 @@ func main() {
 		`INSERT INTO %v (%v) VALUES (%v);`,
 		Table,
 		strings.Join(cols, ", "),
-		strings.Join(strings.Split(strings.Repeat("?", len(cols)), ""), ", "),
+		strings.Join(params, ", "),
 	), counts...)
 	if err != nil {
 		log.Fatalf("Failed to insert data: %v", err)

@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 const (
@@ -31,7 +31,7 @@ func handleData(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	e := json.NewEncoder(rw)
 
-	rows, err := DB.QueryContext(req.Context(), fmt.Sprintf(`SELECT * FROM %v ORDER BY Date`, Table))
+	rows, err := DB.QueryContext(req.Context(), fmt.Sprintf(`SELECT * FROM %v ORDER BY date;`, Table))
 	if err != nil {
 		e.Encode(map[string]interface{}{
 			"error": err.Error(),
@@ -87,12 +87,21 @@ func handleData(rw http.ResponseWriter, req *http.Request) {
 func main() {
 	root := flag.String("root", "pub", "Root of the web server.")
 	addr := flag.String("addr", ":8080", "Address to listen on.")
-	dbpath := flag.String("db", "ps2pop.db", "Path to database.")
+	dbaddr := flag.String("dbaddr", "localhost", "Database address.")
+	dbuser := flag.String("dbuser", "postgres", "Database user.")
+	dbpass := flag.String("dbpass", "", "Database password.")
+	dbname := flag.String("dbname", "ps2pop", "Database name.")
 	flag.Parse()
 
-	db, err := sql.Open("sqlite3", *dbpath)
+	db, err := sql.Open("postgres", fmt.Sprintf(
+		"postgres://%v:%v@%v/%v?sslmode=disable",
+		*dbuser,
+		*dbpass,
+		*dbaddr,
+		*dbname,
+	))
 	if err != nil {
-		log.Fatalf("Failed to open database at %q: %v", *dbpath, err)
+		log.Fatalf("Failed to open database: %v", err)
 	}
 	DB = db
 

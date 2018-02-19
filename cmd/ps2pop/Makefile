@@ -1,4 +1,8 @@
-.PHONY: clean
+export CGO_ENABLED=0
+
+.PHONY: all clean
+
+all: build ps2pop
 
 clean:
 	go clean -x
