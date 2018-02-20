@@ -104,7 +104,7 @@ func initTable(ctx context.Context, db *sql.DB) error {
 	}
 
 	_, err := db.ExecContext(ctx, fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %v (
-		date DATE PRIMARY KEY DEFAULT CURRENT_DATE,
+		date TIMESTAMP PRIMARY KEY DEFAULT CURRENT_TIMESTAMP,
 		%v
 	);`, Table, strings.Join(cols, ", ")))
 	if err != nil {
