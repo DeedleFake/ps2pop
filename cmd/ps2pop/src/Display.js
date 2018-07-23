@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { CircularProgress } from 'material-ui/Progress'
+
+import CircularProgress from '@material-ui/core/CircularProgress'
 import { ResponsiveContainer, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, Area } from 'recharts'
 
 import * as util from './util'
