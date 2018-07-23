@@ -1,29 +1,25 @@
-import React, { Component } from 'react'
-import Grid from 'material-ui/Grid'
-import AppBar from 'material-ui/AppBar'
-import Toolbar from 'material-ui/Toolbar'
-import Typography from 'material-ui/Typography'
-import Paper from 'material-ui/Paper'
-import { CircularProgress } from 'material-ui/Progress'
-import { withStyles } from 'material-ui/styles'
-import { DatePicker } from 'material-ui-pickers'
+// @format
 
-import KeyboardArrowLeftIcon from 'material-ui-icons/KeyboardArrowLeft'
-import KeyboardArrowRightIcon from 'material-ui-icons/KeyboardArrowRight'
+import React, { Component } from 'react'
+
+import Grid from '@material-ui/core/Grid'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import Paper from '@material-ui/core/Paper'
+import CircularProgress from '@material-ui/core/CircularProgress'
+import TextField from '@material-ui/core/TextField'
+import { withStyles } from '@material-ui/core/styles'
 
 import Display from './Display'
 import * as util from './util'
 
 import { connect } from 'react-redux'
-import {
-	loadPopulation,
-
-	setRange,
-} from './store'
+import { loadPopulation, setRange } from './store'
 
 const styles = (theme) => ({
 	root: {
-		paddingTop: theme.mixins.toolbar.minHeight + (theme.spacing.unit * 2),
+		paddingTop: theme.mixins.toolbar.minHeight + theme.spacing.unit * 2,
 	},
 
 	paper: {
@@ -39,19 +35,37 @@ class App extends Component {
 	}
 
 	get dateFrom() {
-		return this.props.dateFrom
+		let date = this.props.dateFrom
+		if (date instanceof Date) {
+			date = util.formatDate(date)
+		}
+
+		return date
 	}
 
 	set dateFrom(val) {
-		this.props.setRange(val, this.props.dateTo)
+		if (!val) {
+			return
+		}
+
+		this.props.setRange(new Date(val), this.props.dateTo)
 	}
 
 	get dateTo() {
-		return this.props.dateTo
+		let date = this.props.dateTo
+		if (date instanceof Date) {
+			date = util.formatDate(date)
+		}
+
+		return date
 	}
 
 	set dateTo(val) {
-		this.props.setRange(this.props.dateFrom, val)
+		if (!val) {
+			return
+		}
+
+		this.props.setRange(this.props.dateFrom, new Date(val))
 	}
 
 	render() {
@@ -59,13 +73,13 @@ class App extends Component {
 			<div className={this.props.classes.root}>
 				<AppBar>
 					<Toolbar>
-						<Typography variant='title' color='inherit'>
+						<Typography variant="title" color="inherit">
 							PlanetSide 2 Population
 						</Typography>
 					</Toolbar>
 				</AppBar>
 
-				<Grid container justify='center'>
+				<Grid container justify="center">
 					<Grid item xs={10}>
 						<Paper className={this.props.classes.paper}>
 							<Display />
@@ -74,35 +88,46 @@ class App extends Component {
 
 					<Grid item xs={3}>
 						<Paper className={this.props.classes.paper}>
-							{!this.props.dateFrom || !this.props.population.length
-								? <CircularProgress />
-								: <DatePicker
-										label='From'
-										value={this.dateFrom}
-										onChange={(date) => this.dateFrom = date}
-										minDate={util.dateRoundDown(this.props.population[0].time)}
-										maxDate={util.dateRoundUp(this.props.dateTo)}
-										leftArrowIcon={<KeyboardArrowLeftIcon />}
-										rightArrowIcon={<KeyboardArrowRightIcon />}
-									/>
-							}
+							{!this.props.dateFrom || !this.props.population.length ? (
+								<CircularProgress />
+							) : (
+								<TextField
+									type="date"
+									value={this.dateFrom}
+									onChange={(ev) => (this.dateFrom = ev.currentTarget.value)}
+									inputProps={{
+										min: util.formatDate(
+											util.dateRoundDown(this.props.population[0].time),
+										),
+										max: this.dateTo,
+									}}
+									required
+								/>
+							)}
 						</Paper>
 					</Grid>
 
 					<Grid item xs={3}>
 						<Paper className={this.props.classes.paper}>
-							{!this.props.dateTo || !this.props.population.length
-								? <CircularProgress />
-								: <DatePicker
-										label='To'
-										value={this.dateTo}
-										onChange={(date) => this.dateTo = date}
-										minDate={util.dateRoundDown(this.props.dateFrom)}
-										maxDate={util.dateRoundUp(this.props.population[this.props.population.length - 1].time)}
-										leftArrowIcon={<KeyboardArrowLeftIcon />}
-										rightArrowIcon={<KeyboardArrowRightIcon />}
-									/>
-							}
+							{!this.props.dateTo || !this.props.population.length ? (
+								<CircularProgress />
+							) : (
+								<TextField
+									type="date"
+									value={this.dateTo}
+									onChange={(ev) => (this.dateTo = ev.currentTarget.value)}
+									inputProps={{
+										min: this.dateFrom,
+										max: util.formatDate(
+											util.dateRoundUp(
+												this.props.population[this.props.population.length - 1]
+													.time,
+											),
+										),
+									}}
+									required
+								/>
+							)}
 						</Paper>
 					</Grid>
 				</Grid>
@@ -121,7 +146,6 @@ export default connect(
 
 	{
 		loadPopulation,
-
 		setRange,
 	},
 )(withStyles(styles)(App))

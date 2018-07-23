@@ -1,8 +1,10 @@
+// @format
+
 import * as actions from './actions'
 
 import * as util from '../util'
 
-export const loadPopulation = () => async ({getState, dispatch}) => {
+export const loadPopulation = () => async ({ getState, dispatch }) => {
 	let population = util.parseJSON(await util.ajax('/data'))
 
 	return dispatch({

@@ -4,8 +4,9 @@
   "description": "A population tracker for PlanetSide 2.",
   "scripts": {
     "start": "BROWSER=none react-scripts start",
+		"prettier": "find src -iname '*.js' -exec prettier --write {} +",
     "build": "react-scripts build",
-		"clean": "rm -fr build"
+    "clean": "rm -fr build"
   },
   "repository": {
     "type": "git",
@@ -21,17 +22,22 @@
     "url": "https://github.com/DeedleFake/ps2pop/issues"
   },
   "devDependencies": {
-    "mat": "^0.1.29",
-    "material-ui": "^1.0.0-beta.34",
-    "material-ui-icons": "^1.0.0-beta.17",
-    "material-ui-pickers": "^1.0.0-beta.15.1",
-    "moment": "^2.11.2",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
+    "@material-ui/core": "^1.4.1",
+    "prettier": "^1.13.7",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "react-redux": "^5.0.7",
-    "react-scripts": "^1.1.1",
-    "recharts": "^1.0.0-beta.10",
-    "redux": "^3.7.2"
+    "react-scripts": "^1.1.4",
+    "recharts": "^1.1.0",
+    "redux": "^4.0.0"
   },
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:8080",
+  "prettier": {
+    "arrowParens": "always",
+    "parser": "flow",
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "useTabs": true
+  }
 }
