@@ -1,3 +1,5 @@
+// @format
+
 import React, { Component } from 'react'
 
 import Grid from '@material-ui/core/Grid'
@@ -13,14 +15,11 @@ import Display from './Display'
 import * as util from './util'
 
 import { connect } from 'react-redux'
-import {
-	loadPopulation,
-	setRange,
-} from './store'
+import { loadPopulation, setRange } from './store'
 
 const styles = (theme) => ({
 	root: {
-		paddingTop: theme.mixins.toolbar.minHeight + (theme.spacing.unit * 2),
+		paddingTop: theme.mixins.toolbar.minHeight + theme.spacing.unit * 2,
 	},
 
 	paper: {
@@ -74,13 +73,13 @@ class App extends Component {
 			<div className={this.props.classes.root}>
 				<AppBar>
 					<Toolbar>
-						<Typography variant='title' color='inherit'>
+						<Typography variant="title" color="inherit">
 							PlanetSide 2 Population
 						</Typography>
 					</Toolbar>
 				</AppBar>
 
-				<Grid container justify='center'>
+				<Grid container justify="center">
 					<Grid item xs={10}>
 						<Paper className={this.props.classes.paper}>
 							<Display />
@@ -89,37 +88,46 @@ class App extends Component {
 
 					<Grid item xs={3}>
 						<Paper className={this.props.classes.paper}>
-							{!this.props.dateFrom || !this.props.population.length
-								? <CircularProgress />
-								: <TextField
-										type='date'
-										value={this.dateFrom}
-										onChange={(ev) => this.dateFrom = ev.currentTarget.value}
-										inputProps={{
-											min: util.formatDate(util.dateRoundDown(this.props.population[0].time)),
-											max: this.dateTo,
-										}}
-										required
-									/>
-							}
+							{!this.props.dateFrom || !this.props.population.length ? (
+								<CircularProgress />
+							) : (
+								<TextField
+									type="date"
+									value={this.dateFrom}
+									onChange={(ev) => (this.dateFrom = ev.currentTarget.value)}
+									inputProps={{
+										min: util.formatDate(
+											util.dateRoundDown(this.props.population[0].time),
+										),
+										max: this.dateTo,
+									}}
+									required
+								/>
+							)}
 						</Paper>
 					</Grid>
 
 					<Grid item xs={3}>
 						<Paper className={this.props.classes.paper}>
-							{!this.props.dateTo || !this.props.population.length
-								? <CircularProgress />
-								: <TextField
-										type='date'
-										value={this.dateTo}
-										onChange={(ev) => this.dateTo = ev.currentTarget.value}
-										inputProps={{
-											min: this.dateFrom,
-											max: util.formatDate(util.dateRoundUp(this.props.population[this.props.population.length - 1].time)),
-										}}
-										required
-									/>
-							}
+							{!this.props.dateTo || !this.props.population.length ? (
+								<CircularProgress />
+							) : (
+								<TextField
+									type="date"
+									value={this.dateTo}
+									onChange={(ev) => (this.dateTo = ev.currentTarget.value)}
+									inputProps={{
+										min: this.dateFrom,
+										max: util.formatDate(
+											util.dateRoundUp(
+												this.props.population[this.props.population.length - 1]
+													.time,
+											),
+										),
+									}}
+									required
+								/>
+							)}
 						</Paper>
 					</Grid>
 				</Grid>

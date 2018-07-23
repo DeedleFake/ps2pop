@@ -4,6 +4,7 @@
   "description": "A population tracker for PlanetSide 2.",
   "scripts": {
     "start": "BROWSER=none react-scripts start",
+		"prettier": "find src -iname '*.js' -exec prettier --write {} +",
     "build": "react-scripts build",
     "clean": "rm -fr build"
   },
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@material-ui/core": "^1.4.1",
+    "prettier": "^1.13.7",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-redux": "^5.0.7",

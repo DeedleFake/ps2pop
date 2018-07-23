@@ -1,3 +1,5 @@
+// @format
+
 export const ajax = async (url) => {
 	return await new Promise((resolve, reject) => {
 		const req = new XMLHttpRequest()
@@ -12,16 +14,24 @@ export const ajax = async (url) => {
 	})
 }
 
-export const parseJSON = (raw) => JSON.parse(raw, (k, v) => {
-	let date = Date.parse(v)
-	if (!isNaN(date)) {
-		return new Date(date)
-	}
+export const parseJSON = (raw) =>
+	JSON.parse(raw, (k, v) => {
+		let date = Date.parse(v)
+		if (!isNaN(date)) {
+			return new Date(date)
+		}
 
-	return v
-})
+		return v
+	})
 
-export const formatDate = (t) => `${t.getUTCFullYear().toString().padStart(4, '0')}-${(t.getUTCMonth() + 1).toString().padStart(2, '0')}-${t.getUTCDate().toString().padStart(2, '0')}`
+export const formatDate = (t) =>
+	`${t
+		.getUTCFullYear()
+		.toString()
+		.padStart(4, '0')}-${(t.getUTCMonth() + 1).toString().padStart(2, '0')}-${t
+		.getUTCDate()
+		.toString()
+		.padStart(2, '0')}`
 
 export const dateRoundDown = (date) => {
 	date = new Date(date)
@@ -45,4 +55,4 @@ export const dateRoundUp = (date) => {
 	return date
 }
 
-export const plural = (str, num) => num === 1 ? str : `${str}s`
+export const plural = (str, num) => (num === 1 ? str : `${str}s`)

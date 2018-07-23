@@ -1,3 +1,5 @@
+// @format
+
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 
 import population from './population'
@@ -6,9 +8,9 @@ import range from './range'
 export * from './population'
 export * from './range'
 
-const asyncMiddleware = ({getState, dispatch}) => (next) => (action) => {
+const asyncMiddleware = ({ getState, dispatch }) => (next) => (action) => {
 	if (action instanceof Function) {
-		return action({getState, dispatch})
+		return action({ getState, dispatch })
 	}
 
 	if (action instanceof Promise) {
@@ -26,9 +28,5 @@ export default createStore(
 		range,
 	}),
 
-	reduxCompose(
-		applyMiddleware(
-			asyncMiddleware,
-		),
-	),
+	reduxCompose(applyMiddleware(asyncMiddleware)),
 )

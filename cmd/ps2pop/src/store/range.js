@@ -1,3 +1,5 @@
+// @format
+
 import * as actions from './actions'
 
 export const setRange = (from, to) => ({
