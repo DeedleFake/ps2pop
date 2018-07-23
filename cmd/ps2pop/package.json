@@ -22,8 +22,6 @@
   },
   "devDependencies": {
     "@material-ui/core": "^1.4.1",
-    "@material-ui/icons": "^2.0.0",
-    "material-ui-pickers": "^1.0.0-rc.11",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-redux": "^5.0.7",
@@ -31,5 +29,13 @@
     "recharts": "^1.1.0",
     "redux": "^4.0.0"
   },
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:8080",
+  "prettier": {
+    "arrowParens": "always",
+    "parser": "flow",
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "useTabs": true
+  }
 }

@@ -6,11 +6,8 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import TextField from '@material-ui/core/TextField'
 import { withStyles } from '@material-ui/core/styles'
-import { DatePicker } from 'material-ui-pickers'
-
-import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft'
-import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight'
 
 import Display from './Display'
 import * as util from './util'
@@ -18,7 +15,6 @@ import * as util from './util'
 import { connect } from 'react-redux'
 import {
 	loadPopulation,
-
 	setRange,
 } from './store'
 
@@ -40,19 +36,37 @@ class App extends Component {
 	}
 
 	get dateFrom() {
-		return this.props.dateFrom
+		let date = this.props.dateFrom
+		if (date instanceof Date) {
+			date = util.formatDate(date)
+		}
+
+		return date
 	}
 
 	set dateFrom(val) {
-		this.props.setRange(val, this.props.dateTo)
+		if (!val) {
+			return
+		}
+
+		this.props.setRange(new Date(val), this.props.dateTo)
 	}
 
 	get dateTo() {
-		return this.props.dateTo
+		let date = this.props.dateTo
+		if (date instanceof Date) {
+			date = util.formatDate(date)
+		}
+
+		return date
 	}
 
 	set dateTo(val) {
-		this.props.setRange(this.props.dateFrom, val)
+		if (!val) {
+			return
+		}
+
+		this.props.setRange(this.props.dateFrom, new Date(val))
 	}
 
 	render() {
@@ -77,14 +91,15 @@ class App extends Component {
 						<Paper className={this.props.classes.paper}>
 							{!this.props.dateFrom || !this.props.population.length
 								? <CircularProgress />
-								: <DatePicker
-										label='From'
+								: <TextField
+										type='date'
 										value={this.dateFrom}
-										onChange={(date) => this.dateFrom = date}
-										minDate={util.dateRoundDown(this.props.population[0].time)}
-										maxDate={util.dateRoundUp(this.props.dateTo)}
-										leftArrowIcon={<KeyboardArrowLeftIcon />}
-										rightArrowIcon={<KeyboardArrowRightIcon />}
+										onChange={(ev) => this.dateFrom = ev.currentTarget.value}
+										inputProps={{
+											min: util.formatDate(util.dateRoundDown(this.props.population[0].time)),
+											max: this.dateTo,
+										}}
+										required
 									/>
 							}
 						</Paper>
@@ -94,14 +109,15 @@ class App extends Component {
 						<Paper className={this.props.classes.paper}>
 							{!this.props.dateTo || !this.props.population.length
 								? <CircularProgress />
-								: <DatePicker
-										label='To'
+								: <TextField
+										type='date'
 										value={this.dateTo}
-										onChange={(date) => this.dateTo = date}
-										minDate={util.dateRoundDown(this.props.dateFrom)}
-										maxDate={util.dateRoundUp(this.props.population[this.props.population.length - 1].time)}
-										leftArrowIcon={<KeyboardArrowLeftIcon />}
-										rightArrowIcon={<KeyboardArrowRightIcon />}
+										onChange={(ev) => this.dateTo = ev.currentTarget.value}
+										inputProps={{
+											min: this.dateFrom,
+											max: util.formatDate(util.dateRoundUp(this.props.population[this.props.population.length - 1].time)),
+										}}
+										required
 									/>
 							}
 						</Paper>
@@ -122,7 +138,6 @@ export default connect(
 
 	{
 		loadPopulation,
-
 		setRange,
 	},
 )(withStyles(styles)(App))
