@@ -1,7 +1,8 @@
 module github.com/DeedleFake/ps2pop
 
+go 1.20
+
 require (
-	github.com/lib/pq v0.0.0-20180201184707-88edab080323
-	golang.org/x/net v0.0.0-20180218175443-cbe0f9307d01
-	golang.org/x/sync v0.0.0-20171101214715-fd80eb99c8f6
+	github.com/lib/pq v1.10.9
+	golang.org/x/sync v0.3.0
 )
